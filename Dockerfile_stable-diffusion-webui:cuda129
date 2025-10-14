@@ -1,0 +1,23 @@
+FROM pytorch/pytorch:2.8.0-cuda12.9-cudnn9-runtime
+
+RUN apt-get update; apt-get -y install wget git python3 python3-venv libgl1 libglib2.0-0 git-lfs python3-pip python-is-python3 libcairo2-dev pkg-config python3-dev
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN adduser --disabled-password --gecos '' user
+RUN chown -R user:user /home/user
+USER user
+ENV PATH="$PATH:/home/user/.local/bin"
+
+WORKDIR /home/user
+
+RUN pip3 install --upgrade pip
+RUN git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui
+
+WORKDIR /home/user/stable-diffusion-webui
+RUN chmod +x webui.sh
+
+RUN pip3 install --use-pep517 xformers GitPython Pillow accelerate blendmodes clean-fid diskcache einops facexlib fastapi>=0.90.1 gradio==3.41.2 inflection jsonmerge kornia lark numpy omegaconf open-clip-torch piexif protobuf==3.20.0 psutil pytorch_lightning requests resize-right safetensors scikit-image>=0.19 tomesd torchdiffeq torchsde transformers==4.30.2
+RUN pip3 cache purge
+
+EXPOSE 7860
+CMD ["python", "launch.py", "--listen", "--api"]
