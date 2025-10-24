@@ -1,0 +1,17 @@
+FROM pytorch/pytorch:2.8.0-cuda12.9-cudnn9-runtime
+
+RUN apt-get update
+RUN apt-get install -y git
+
+WORKDIR /
+
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git
+RUN pip3 install --upgrade pip
+
+WORKDIR /ComfyUI
+
+RUN pip install -r requirements.txt
+
+EXPOSE 8188
+
+CMD ["python", "main.py", "--listen"]
